@@ -1,12 +1,12 @@
 const router = require('express').Router();
 const Location = require('../models/Location');
 const Student = require('../models/Student');
+const auth = require('../middleware/auth');
 
 function dmsToDecimal(degrees, minutes, seconds) {
   return parseFloat(degrees) + parseFloat(minutes) / 60 + parseFloat(seconds) / 3600;
 }
 
-// POST /api/locations — receive GPS ping from tracker device
 router.post('/', async (req, res) => {
   try {
     const { ID, Coordinates, Time } = req.body;
@@ -34,8 +34,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/locations — get latest position of all students
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   const locations = await Location.find();
   const students = await Student.find();
 
@@ -51,8 +50,7 @@ router.get('/', async (req, res) => {
   res.json(enriched);
 });
 
-// GET /api/locations/:id — get latest position of one student
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   const location = await Location.findOne({ studentId: req.params.id });
   if (!location) return res.status(404).json({ error: 'Location not found' });
   res.json(location);

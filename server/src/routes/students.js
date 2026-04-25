@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const Student = require('../models/Student');
+const auth = require('../middleware/auth');
 
-// POST /api/students — register a student
 router.post('/', async (req, res) => {
   try {
     const student = await Student.create(req.body);
@@ -12,14 +12,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/students — get all students
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   const students = await Student.find();
   res.json(students);
 });
 
-// GET /api/students/:id — get single student
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   const student = await Student.findOne({ id: req.params.id });
   if (!student) return res.status(404).json({ error: 'Student not found' });
   res.json(student);

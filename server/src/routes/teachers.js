@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Teacher = require('../models/Teacher');
 const Student = require('../models/Student');
+const auth = require('../middleware/auth');
 
 router.post('/', async (req, res) => {
   try {
@@ -12,18 +13,18 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   const teachers = await Teacher.find();
   res.json(teachers);
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   const teacher = await Teacher.findOne({ id: req.params.id });
   if (!teacher) return res.status(404).json({ error: 'Teacher not found' });
   res.json(teacher);
 });
 
-router.get('/:id/students', async (req, res) => {
+router.get('/:id/students', auth, async (req, res) => {
   const teacher = await Teacher.findOne({ id: req.params.id });
   if (!teacher) return res.status(404).json({ error: 'Teacher not found' });
   const students = await Student.find({ className: teacher.className });
